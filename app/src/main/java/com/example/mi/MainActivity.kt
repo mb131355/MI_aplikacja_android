@@ -16,13 +16,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.mi.ui.theme.MiTheme
-
 import com.example.mi.aktualnosci.EkranAktualnosci
 import com.example.mi.kategorie.EkranKategorie
 import com.example.mi.nawigacja.Trasy
 import com.example.mi.sekcje.EkranSekcji
 import com.example.mi.ustawienia.EkranUstawienia
-
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.collectAsState
 import com.example.mi.spiewnik.EkranSpiewnikLista
@@ -57,10 +55,14 @@ private fun Aplikacja() {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
+            val aktualnaTrasa = navController.currentBackStackEntryAsState().value?.destination?.route
+
             val wSpiewniku = aktualnaTrasa == Trasy.SPIEWNIK_LISTA ||
                     (aktualnaTrasa?.startsWith("spiewnik_tekst/") == true)
 
-            if (!wSpiewniku) {
+            val wSekcji = aktualnaTrasa?.startsWith("sekcja/") == true
+
+            if (!wSpiewniku && !wSekcji) {
                 GornyPasek(navController)
             }
         },
@@ -87,7 +89,10 @@ private fun Aplikacja() {
 
             composable(Trasy.SEKCA) { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
-                EkranSekcji(id = id)
+                EkranSekcji(
+                    id = id,
+                    navController = navController
+                )
             }
             composable(Trasy.SPIEWNIK_LISTA) {
                 EkranSpiewnikLista(
